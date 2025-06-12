@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="800" viewBox="0 0 1200 800">
+  <style>
+    .node rect { fill: #fff; stroke: #333; stroke-width: 2px; }
+    .node text { font-family: Arial; font-size: 14px; }
+    .source rect { fill: #f9f; stroke: #333; stroke-width: 2px; }
+    .storage rect { fill: #bbf; stroke: #333; stroke-width: 2px; }
+    .process rect { fill: #bfb; stroke: #333; stroke-width: 2px; }
+    .catalog rect { fill: #fbb; stroke: #333; stroke-width: 2px; }
+    .monitoring rect { fill: #fbf; stroke: #333; stroke-width: 2px; }
+    .edgePath path { stroke: #333; stroke-width: 1.5px; }
+    .edgeLabel rect { fill: #fff; }
+    .edgeLabel text { font-family: Arial; font-size: 12px; }
+  </style>
+  <rect width="100%" height="100%" fill="white"/>
+  
+  <!-- Data Sources -->
+  <g class="source">
+    <rect x="50" y="50" width="150" height="50" rx="5" ry="5"/>
+    <text x="125" y="80" text-anchor="middle">External Data Sources</text>
+  </g>
+  <g class="source">
+    <rect x="50" y="150" width="150" height="50" rx="5" ry="5"/>
+    <text x="125" y="180" text-anchor="middle">Database Sources</text>
+  </g>
+  <g class="source">
+    <rect x="50" y="250" width="150" height="50" rx="5" ry="5"/>
+    <text x="125" y="280" text-anchor="middle">API Sources</text>
+  </g>
+  <g class="source">
+    <rect x="50" y="350" width="150" height="50" rx="5" ry="5"/>
+    <text x="125" y="380" text-anchor="middle">Streaming Sources</text>
+  </g>
+  
+  <!-- Ingestion Layer -->
+  <g class="process">
+    <rect x="300" y="150" width="150" height="50" rx="5" ry="5"/>
+    <text x="375" y="180" text-anchor="middle">Lambda Connector</text>
+  </g>
+  <g class="process">
+    <rect x="300" y="250" width="150" height="50" rx="5" ry="5"/>
+    <text x="375" y="280" text-anchor="middle">Lambda Connector</text>
+  </g>
+  <g class="process">
+    <rect x="300" y="350" width="150" height="50" rx="5" ry="5"/>
+    <text x="375" y="380" text-anchor="middle">Kinesis Data Streams</text>
+  </g>
+  <g class="storage">
+    <rect x="300" y="50" width="150" height="50" rx="5" ry="5"/>
+    <text x="375" y="80" text-anchor="middle">S3 Ingestion Bucket</text>
+  </g>
+  
+  <!-- Trigger Mechanisms -->
+  <g class="process">
+    <rect x="550" y="100" width="150" height="50" rx="5" ry="5"/>
+    <text x="625" y="130" text-anchor="middle">CloudWatch EventBridge</text>
+  </g>
+  <g class="process">
+    <rect x="550" y="200" width="150" height="50" rx="5" ry="5"/>
+    <text x="625" y="230" text-anchor="middle">Scheduled Trigger</text>
+  </g>
+  <g class="process">
+    <rect x="550" y="300" width="150" height="50" rx="5" ry="5"/>
+    <text x="625" y="330" text-anchor="middle">Manual Trigger</text>
+  </g>
+  
+  <!-- Workflow Orchestration -->
+  <g class="process">
+    <rect x="800" y="100" width="150" height="50" rx="5" ry="5"/>
+    <text x="875" y="130" text-anchor="middle">Glue Workflow</text>
+  </g>
+  
+  <!-- Data Processing -->
+  <g class="process">
+    <rect x="800" y="200" width="150" height="50" rx="5" ry="5"/>
+    <text x="875" y="230" text-anchor="middle">Raw Data Processing Job</text>
+  </g>
+  <g class="storage">
+    <rect x="800" y="300" width="150" height="50" rx="5" ry="5"/>
+    <text x="875" y="330" text-anchor="middle">S3 Raw Bucket</text>
+  </g>
+  <g class="process">
+    <rect x="800" y="400" width="150" height="50" rx="5" ry="5"/>
+    <text x="875" y="430" text-anchor="middle">Raw Data Crawler</text>
+  </g>
+  
+  <!-- Processing Layer -->
+  <g class="process">
+    <rect x="800" y="500" width="150" height="50" rx="5" ry="5"/>
+    <text x="875" y="530" text-anchor="middle">Data Processing Job</text>
+  </g>
+  <g class="storage">
+    <rect x="800" y="600" width="150" height="50" rx="5" ry="5"/>
+    <text x="875" y="630" text-anchor="middle">S3 Processed Bucket</text>
+  </g>
+  <g class="process">
+    <rect x="800" y="700" width="150" height="50" rx="5" ry="5"/>
+    <text x="875" y="730" text-anchor="middle">Processed Data Crawler</text>
+  </g>
+  
+  <!-- Curation Layer -->
+  <g class="process">
+    <rect x="1050" y="200" width="150" height="50" rx="5" ry="5"/>
+    <text x="1125" y="230" text-anchor="middle">Data Curation Job</text>
+  </g>
+  <g class="storage">
+    <rect x="1050" y="300" width="150" height="50" rx="5" ry="5"/>
+    <text x="1125" y="330" text-anchor="middle">S3 Curated Bucket</text>
+  </g>
+  <g class="process">
+    <rect x="1050" y="400" width="150" height="50" rx="5" ry="5"/>
+    <text x="1125" y="430" text-anchor="middle">Curated Data Crawler</text>
+  </g>
+  
+  <!-- Data Catalog -->
+  <g class="catalog">
+    <rect x="1050" y="500" width="150" height="50" rx="5" ry="5"/>
+    <text x="1125" y="530" text-anchor="middle">Glue Data Catalog</text>
+  </g>
+  
+  <!-- Data Access -->
+  <g class="catalog">
+    <rect x="1050" y="600" width="150" height="50" rx="5" ry="5"/>
+    <text x="1125" y="630" text-anchor="middle">Amazon Athena</text>
+  </g>
+  <g class="catalog">
+    <rect x="1050" y="700" width="150" height="50" rx="5" ry="5"/>
+    <text x="1125" y="730" text-anchor="middle">Redshift Spectrum</text>
+  </g>
+  
+  <!-- Monitoring -->
+  <g class="monitoring">
+    <rect x="550" y="400" width="150" height="50" rx="5" ry="5"/>
+    <text x="625" y="430" text-anchor="middle">CloudWatch Metrics</text>
+  </g>
+  <g class="monitoring">
+    <rect x="550" y="500" width="150" height="50" rx="5" ry="5"/>
+    <text x="625" y="530" text-anchor="middle">Monitoring Lambda</text>
+  </g>
+  <g class="monitoring">
+    <rect x="550" y="600" width="150" height="50" rx="5" ry="5"/>
+    <text x="625" y="630" text-anchor="middle">SNS Notifications</text>
+  </g>
+  <g class="storage">
+    <rect x="550" y="700" width="150" height="50" rx="5" ry="5"/>
+    <text x="625" y="730" text-anchor="middle">DynamoDB</text>
+  </g>
+  
+  <!-- Connector Lines -->
+  <!-- Data Sources to Ingestion -->
+  <path d="M 200,75 L 300,75" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 200,175 L 300,175" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 200,275 L 300,275" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 200,375 L 300,375" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Connectors to S3 Ingestion -->
+  <path d="M 375,150 L 375,100" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 375,250 L 375,100" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 375,350 L 375,100" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- S3 Ingestion to EventBridge -->
+  <path d="M 450,75 L 550,125" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Triggers to EventBridge -->
+  <path d="M 625,200 L 625,150" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 625,300 L 625,150" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- EventBridge to Workflow -->
+  <path d="M 700,125 L 800,125" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Workflow to Jobs -->
+  <path d="M 875,150 L 875,200" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 875,150 L 875,500" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 950,125 L 1050,200" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- S3 Ingestion to Raw Job -->
+  <path d="M 450,75 C 500,75 700,175 800,225" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Raw Job to S3 Raw -->
+  <path d="M 875,250 L 875,300" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- S3 Raw to Raw Crawler -->
+  <path d="M 875,350 L 875,400" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Raw Crawler to Glue Catalog -->
+  <path d="M 950,425 C 1000,425 1000,500 1050,525" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- S3 Raw to Processing Job -->
+  <path d="M 875,350 L 875,500" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Processing Job to S3 Processed -->
+  <path d="M 875,550 L 875,600" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- S3 Processed to Processed Crawler -->
+  <path d="M 875,650 L 875,700" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Processed Crawler to Glue Catalog -->
+  <path d="M 950,725 C 1000,725 1000,550 1050,525" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- S3 Processed to Curation Job -->
+  <path d="M 950,625 C 1000,625 1000,225 1050,225" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Curation Job to S3 Curated -->
+  <path d="M 1125,250 L 1125,300" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- S3 Curated to Curated Crawler -->
+  <path d="M 1125,350 L 1125,400" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Curated Crawler to Glue Catalog -->
+  <path d="M 1125,450 L 1125,500" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Glue Catalog to Query Engines -->
+  <path d="M 1125,550 L 1125,600" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 1125,650 L 1125,700" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Jobs to CloudWatch -->
+  <path d="M 800,225 C 700,225 700,425 700,425" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 800,525 C 700,525 700,425 700,425" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 1050,225 C 950,225 700,425 700,425" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- CloudWatch to Lambda -->
+  <path d="M 625,450 L 625,500" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Lambda to SNS -->
+  <path d="M 625,550 L 625,600" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Jobs to DynamoDB -->
+  <path d="M 800,250 C 700,250 600,700 625,700" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 800,550 C 700,550 600,700 625,700" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 1050,250 C 950,250 600,700 625,700" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Lambda to DynamoDB -->
+  <path d="M 625,550 C 625,625 625,700 625,700" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- Arrow Marker -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+    </marker>
+  </defs>
+</svg>

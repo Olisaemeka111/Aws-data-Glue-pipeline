@@ -1,0 +1,266 @@
+name: AWS Glue ETL Pipeline CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  AWS_REGION: us-east-1
+  TERRAFORM_VERSION: 1.5.0
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Format Check
+        run: |
+          cd terraform
+          terraform fmt -check -recursive
+
+      - name: Validate Terraform Modules
+        run: |
+          cd terraform/modules/networking
+          terraform init -backend=false
+          terraform validate
+          
+          cd ../storage
+          terraform init -backend=false
+          terraform validate
+          
+          cd ../security
+          terraform init -backend=false
+          terraform validate
+          
+          cd ../glue
+          terraform init -backend=false
+          terraform validate
+          
+          cd ../monitoring
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Terraform Environments
+        run: |
+          cd terraform/environments/dev
+          terraform init -backend=false
+          terraform validate
+          
+          cd ../staging
+          terraform init -backend=false
+          terraform validate
+          
+          cd ../prod
+          terraform init -backend=false
+          terraform validate
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pylint black
+
+      - name: Lint Python code
+        run: |
+          pylint --disable=C0111,C0103,C0303,W1201,W1202 src/jobs/ src/utils/ src/lambda/
+
+      - name: Format Python code
+        run: |
+          black --check src/jobs/ src/utils/ src/lambda/
+
+      - name: Run Python tests
+        run: |
+          pytest -xvs tests/
+
+  plan:
+    name: Plan
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        environment: [dev]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        run: |
+          cd terraform/environments/${{ matrix.environment }}
+          terraform init
+
+      - name: Terraform Plan
+        run: |
+          cd terraform/environments/${{ matrix.environment }}
+          terraform plan -var-file=terraform.tfvars -out=tfplan
+          terraform show -json tfplan > tfplan.json
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan-${{ matrix.environment }}
+          path: terraform/environments/${{ matrix.environment }}/tfplan.json
+
+  deploy:
+    name: Deploy
+    needs: [validate, plan]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Create Lambda package
+        run: |
+          cd src/lambda/monitoring
+          zip -r ../../../monitoring.zip .
+
+      - name: Terraform Init
+        run: |
+          cd terraform/environments/${{ github.event.inputs.environment }}
+          terraform init
+
+      - name: Terraform Apply
+        run: |
+          cd terraform/environments/${{ github.event.inputs.environment }}
+          terraform apply -var-file=terraform.tfvars -auto-approve
+
+      - name: Upload Glue Job Scripts
+        run: |
+          BUCKET_NAME="glue-etl-pipeline-${{ github.event.inputs.environment }}-scripts"
+          aws s3 cp src/jobs/ s3://$BUCKET_NAME/jobs/ --recursive
+
+      - name: Upload Lambda Package
+        run: |
+          BUCKET_NAME="glue-etl-pipeline-${{ github.event.inputs.environment }}-scripts"
+          aws s3 cp monitoring.zip s3://$BUCKET_NAME/lambda/monitoring.zip
+
+  test-glue-jobs:
+    name: Test Glue Jobs
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Run Test Data Ingestion
+        run: |
+          # Generate test data
+          mkdir -p test-data
+          echo "id,customer_id,transaction_date,amount" > test-data/test.csv
+          echo "1,C001,2023-01-01,100.00" >> test-data/test.csv
+          echo "2,C002,2023-01-01,200.00" >> test-data/test.csv
+          
+          # Upload test data to raw bucket
+          BUCKET_NAME="glue-etl-pipeline-${{ github.event.inputs.environment }}-raw"
+          YEAR=$(date +%Y)
+          MONTH=$(date +%m)
+          DAY=$(date +%d)
+          aws s3 cp test-data/test.csv s3://$BUCKET_NAME/data/incoming/$YEAR/$MONTH/$DAY/test.csv
+          
+          # Start Glue job
+          JOB_NAME="glue-etl-pipeline-${{ github.event.inputs.environment }}-data-ingestion"
+          aws glue start-job-run --job-name $JOB_NAME
+          
+          # Wait for job completion
+          echo "Waiting for job to complete..."
+          sleep 60
+          
+          # Check job status
+          JOB_RUN_ID=$(aws glue get-job-runs --job-name $JOB_NAME --query "JobRuns[0].Id" --output text)
+          JOB_STATUS=$(aws glue get-job-run --job-name $JOB_NAME --run-id $JOB_RUN_ID --query "JobRun.JobRunState" --output text)
+          echo "Job status: $JOB_STATUS"
+          
+          if [ "$JOB_STATUS" != "SUCCEEDED" ]; then
+            echo "Job failed or still running. Check CloudWatch logs for details."
+            exit 1
+          fi
+
+  cleanup:
+    name: Cleanup
+    needs: test-glue-jobs
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Cleanup Test Data
+        run: |
+          BUCKET_NAME="glue-etl-pipeline-${{ github.event.inputs.environment }}-raw"
+          YEAR=$(date +%Y)
+          MONTH=$(date +%m)
+          DAY=$(date +%d)
+          aws s3 rm s3://$BUCKET_NAME/data/incoming/$YEAR/$MONTH/$DAY/test.csv
