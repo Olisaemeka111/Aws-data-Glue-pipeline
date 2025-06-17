@@ -246,14 +246,14 @@ validate_terraform_files() {
     
     # Initialize Terraform
     log_info "Initializing Terraform..."
-    if ! terraform init -backend=true &>> "$LOG_FILE"; then
+    if ! terraform init -backend=true >> "$LOG_FILE" 2>&1; then
         log_error "Terraform initialization failed"
         exit 1
     fi
     
     # Validate Terraform configuration
     log_info "Validating Terraform configuration..."
-    if ! terraform validate &>> "$LOG_FILE"; then
+    if ! terraform validate >> "$LOG_FILE" 2>&1; then
         log_error "Terraform validation failed"
         exit 1
     fi
@@ -275,7 +275,7 @@ validate_glue_scripts() {
         fi
         
         # Basic Python syntax validation
-        if ! python3 -m py_compile "$script_path" &>> "$LOG_FILE"; then
+        if ! python3 -m py_compile "$script_path" >> "$LOG_FILE" 2>&1; then
             log_error "Python syntax error in $script"
             exit 1
         fi
@@ -286,7 +286,7 @@ validate_glue_scripts() {
     # Validate utility modules
     local utils_dir="$PROJECT_ROOT/src/utils"
     if [[ -f "$utils_dir/glue_utils.py" ]]; then
-        if ! python3 -m py_compile "$utils_dir/glue_utils.py" &>> "$LOG_FILE"; then
+        if ! python3 -m py_compile "$utils_dir/glue_utils.py" >> "$LOG_FILE" 2>&1; then
             log_error "Python syntax error in glue_utils.py"
             exit 1
         fi
@@ -323,7 +323,7 @@ upload_glue_scripts() {
     
     # Upload job scripts
     local scripts_dir="$PROJECT_ROOT/src"
-    if ! aws s3 sync "$scripts_dir" "s3://$scripts_bucket/" --delete --exclude "*.pyc" --exclude "__pycache__/*" &>> "$LOG_FILE"; then
+    if ! aws s3 sync "$scripts_dir" "s3://$scripts_bucket/" --delete --exclude "*.pyc" --exclude "__pycache__/*" >> "$LOG_FILE" 2>&1; then
         log_error "Failed to upload scripts to S3"
         exit 1
     fi
@@ -393,7 +393,7 @@ perform_rollback() {
             log_info "Terraform state restored"
             
             # Refresh and show current state
-            terraform refresh &>> "$LOG_FILE" || log_warn "Could not refresh Terraform state"
+            terraform refresh >> "$LOG_FILE" 2>&1 || log_warn "Could not refresh Terraform state"
         fi
         
         log_success "Rollback completed"
@@ -413,7 +413,7 @@ generate_terraform_plan() {
     export TF_VAR_environment="$ENVIRONMENT"
     
     # Generate plan
-    if ! terraform plan -out="$TERRAFORM_PLAN_FILE" -detailed-exitcode &>> "$LOG_FILE"; then
+    if ! terraform plan -out="$TERRAFORM_PLAN_FILE" -detailed-exitcode >> "$LOG_FILE" 2>&1; then
         local exit_code=$?
         if [[ $exit_code -eq 1 ]]; then
             log_error "Terraform plan failed"
@@ -427,10 +427,14 @@ generate_terraform_plan() {
     
     # Show plan summary
     log_info "Terraform plan summary:"
-    terraform show -no-color "$TERRAFORM_PLAN_FILE" | head -50 | tee -a "$LOG_FILE"
+    terraform show -no-color "$TERRAFORM_PLAN_FILE" | head -n 20 | tee -a "$LOG_FILE"
     
-    if [[ $(terraform show -json "$TERRAFORM_PLAN_FILE" | jq '.resource_changes | length') -gt 0 ]]; then
-        log_info "Resources to be changed:"
+    # Show resource changes count
+    local changes_count=$(terraform show -json "$TERRAFORM_PLAN_FILE" | jq '.resource_changes | length')
+    log_info "Number of resources to be changed: $changes_count"
+    
+    if [[ $changes_count -gt 0 ]]; then
+        log_info "Resource changes summary:"
         terraform show -json "$TERRAFORM_PLAN_FILE" | jq -r '.resource_changes[] | "\(.change.actions[0]): \(.address)"' | tee -a "$LOG_FILE"
     fi
 }
@@ -450,7 +454,7 @@ apply_terraform() {
         apply_args+=("$TERRAFORM_PLAN_FILE")
     fi
     
-    if ! terraform apply "${apply_args[@]}" &>> "$LOG_FILE"; then
+    if ! terraform apply "${apply_args[@]}" >> "$LOG_FILE" 2>&1; then
         log_error "Terraform apply failed"
         exit 1
     fi

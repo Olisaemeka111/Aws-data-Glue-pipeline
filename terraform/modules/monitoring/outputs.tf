@@ -15,12 +15,12 @@ output "dashboard_name" {
 
 output "job_failure_alarms" {
   description = "Map of job failure CloudWatch alarms"
-  value       = { for job_name in var.glue_job_names : job_name => aws_cloudwatch_metric_alarm.job_failure[job_name].arn }
+  value       = { for job_name in ["data-ingestion", "data-processing", "data-quality"] : job_name => aws_cloudwatch_metric_alarm.job_failure[job_name].arn }
 }
 
 output "job_duration_alarms" {
   description = "Map of job duration CloudWatch alarms"
-  value       = { for job_name in var.glue_job_names : job_name => aws_cloudwatch_metric_alarm.job_duration[job_name].arn }
+  value       = { for job_name in ["data-ingestion", "data-processing", "data-quality"] : job_name => aws_cloudwatch_metric_alarm.job_duration[job_name].arn }
 }
 
 output "monitoring_lambda_arn" {

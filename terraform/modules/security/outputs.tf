@@ -18,6 +18,11 @@ output "monitoring_role_name" {
   value       = aws_iam_role.monitoring_role.name
 }
 
+output "lambda_security_group_id" {
+  description = "ID of the security group for Lambda functions"
+  value       = aws_security_group.lambda_security_group.id
+}
+
 output "glue_connection_security_group_id" {
   description = "ID of the security group for AWS Glue connections"
   value       = aws_security_group.glue_connection.id

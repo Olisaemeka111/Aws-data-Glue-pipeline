@@ -25,7 +25,7 @@ resource "aws_iam_policy" "glue_service_policy" {
   
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement = concat([
       {
         Effect = "Allow"
         Action = [
@@ -83,30 +83,30 @@ resource "aws_iam_policy" "glue_service_policy" {
           "cloudwatch:PutMetricData"
         ]
         Resource = ["*"]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "dynamodb:BatchGetItem",
-          "dynamodb:BatchWriteItem",
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:Query",
-          "dynamodb:Scan",
-          "dynamodb:UpdateItem"
-        ]
-        Resource = var.dynamodb_table_arns
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt",
-          "kms:Encrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = var.kms_key_arns
       }
-    ]
+    ],
+    length(var.dynamodb_table_arns) > 0 ? [{
+      Effect = "Allow"
+      Action = [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+      ]
+      Resource = var.dynamodb_table_arns
+    }] : [],
+    length(var.kms_key_arns) > 0 ? [{
+      Effect = "Allow"
+      Action = [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey"
+      ]
+      Resource = var.kms_key_arns
+    }] : [])
   })
 }
 
@@ -180,7 +180,7 @@ resource "aws_iam_policy" "monitoring_policy" {
   
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement = concat([
       {
         Effect = "Allow"
         Action = [
@@ -211,21 +211,40 @@ resource "aws_iam_policy" "monitoring_policy" {
           "cloudwatch:GetMetricStatistics"
         ]
         Resource = ["*"]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "sns:Publish"
-        ]
-        Resource = var.sns_topic_arns
       }
-    ]
+    ],
+    length(var.sns_topic_arns) > 0 ? [{
+      Effect = "Allow"
+      Action = [
+        "sns:Publish"
+      ]
+      Resource = var.sns_topic_arns
+    }] : [])
   })
 }
 
 resource "aws_iam_role_policy_attachment" "monitoring_policy_attachment" {
   role       = aws_iam_role.monitoring_role.name
   policy_arn = aws_iam_policy.monitoring_policy.arn
+}
+
+# Lambda security group
+resource "aws_security_group" "lambda_security_group" {
+  name        = "${var.project_name}-${var.environment}-lambda-sg"
+  description = "Security group for Lambda functions"
+  vpc_id      = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-lambda-sg"
+    Environment = var.environment
+  }
 }
 
 # KMS key for encryption of CloudWatch Logs

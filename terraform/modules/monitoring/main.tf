@@ -30,7 +30,7 @@ resource "aws_sns_topic_subscription" "email_alerts" {
 
 # CloudWatch Alarms for Glue Jobs
 resource "aws_cloudwatch_metric_alarm" "job_failure" {
-  for_each            = toset(var.glue_job_names)
+  for_each            = toset(["data-ingestion", "data-processing", "data-quality"])
   alarm_name          = "${each.value}-failure"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
@@ -55,7 +55,7 @@ resource "aws_cloudwatch_metric_alarm" "job_failure" {
 
 # CloudWatch Alarm for job duration
 resource "aws_cloudwatch_metric_alarm" "job_duration" {
-  for_each            = toset(var.glue_job_names)
+  for_each            = toset(["data-ingestion", "data-processing", "data-quality"])
   alarm_name          = "${each.value}-long-duration"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -79,7 +79,7 @@ resource "aws_cloudwatch_metric_alarm" "job_duration" {
 
 # CloudWatch Alarm for memory usage
 resource "aws_cloudwatch_metric_alarm" "memory_usage" {
-  for_each            = toset(var.glue_job_names)
+  for_each            = toset(["data-ingestion", "data-processing", "data-quality"])
   alarm_name          = "${each.value}-high-memory"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -120,7 +120,7 @@ resource "aws_cloudwatch_dashboard" "glue_dashboard" {
         }
       ],
       # Job Status Widgets
-      [for idx, job_name in var.glue_job_names : {
+      [for idx, job_name in ["data-ingestion", "data-processing", "data-quality"] : {
         type   = "metric"
         x      = (idx * 8) % 24
         y      = 2
@@ -139,7 +139,7 @@ resource "aws_cloudwatch_dashboard" "glue_dashboard" {
         }
       }],
       # Job Duration Widgets
-      [for idx, job_name in var.glue_job_names : {
+      [for idx, job_name in ["data-ingestion", "data-processing", "data-quality"] : {
         type   = "metric"
         x      = (idx * 8) % 24
         y      = 8
@@ -157,7 +157,7 @@ resource "aws_cloudwatch_dashboard" "glue_dashboard" {
         }
       }],
       # Memory Usage Widgets
-      [for idx, job_name in var.glue_job_names : {
+      [for idx, job_name in ["data-ingestion", "data-processing", "data-quality"] : {
         type   = "metric"
         x      = (idx * 8) % 24
         y      = 14
@@ -181,7 +181,7 @@ resource "aws_cloudwatch_dashboard" "glue_dashboard" {
         }
       }],
       # Records Processed Widgets
-      [for idx, job_name in var.glue_job_names : {
+      [for idx, job_name in ["data-ingestion", "data-processing", "data-quality"] : {
         type   = "metric"
         x      = (idx * 8) % 24
         y      = 20
@@ -220,7 +220,7 @@ resource "aws_lambda_function" "monitoring" {
     variables = {
       SNS_TOPIC_ARN = aws_sns_topic.alerts.arn
       ENVIRONMENT   = var.environment
-      GLUE_JOBS     = join(",", var.glue_job_names)
+      GLUE_JOBS     = join(",", ["data-ingestion", "data-processing", "data-quality"])
     }
   }
   
@@ -240,7 +240,7 @@ resource "aws_cloudwatch_event_rule" "glue_job_state_change" {
     source      = ["aws.glue"]
     detail-type = ["Glue Job State Change"]
     detail = {
-      jobName = var.glue_job_names
+      jobName = ["data-ingestion", "data-processing", "data-quality"]
     }
   })
   

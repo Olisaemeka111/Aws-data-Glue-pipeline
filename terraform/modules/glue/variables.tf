@@ -106,3 +106,15 @@ variable "kms_key_arn" {
   type        = string
   default     = null
 }
+
+variable "log_retention_days" {
+  description = "Number of days to retain CloudWatch logs"
+  type        = number
+  default     = 30
+}
+
+variable "sns_topic_arn" {
+  description = "ARN of the SNS topic for notifications"
+  type        = string
+  default     = null
+}

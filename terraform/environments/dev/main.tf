@@ -101,7 +101,7 @@ module "monitoring" {
   enable_encryption         = var.enable_data_encryption
   kms_key_arn               = module.storage.kms_key_arn
   cloudwatch_logs_kms_key_arn = module.security.cloudwatch_logs_kms_key_arn
-  monitoring_role_arn       = module.security.monitoring_role_name
+  monitoring_role_arn       = module.security.monitoring_role_arn
   scripts_bucket_name       = module.storage.scripts_bucket.name
   enable_enhanced_monitoring = var.enable_monitoring
 }
@@ -149,7 +149,7 @@ module "lambda_trigger" {
   aws_account_id      = data.aws_caller_identity.current.account_id
   lambda_zip_path     = var.lambda_zip_path
   source_bucket       = module.storage.raw_bucket.name
-  glue_workflow_name  = module.glue.main_workflow_name
+  glue_workflow_name  = module.glue.workflow_name
   subnet_ids          = module.networking.private_subnet_ids
   security_group_ids  = [module.security.lambda_security_group_id]
   kms_key_arn         = module.storage.kms_key_arn

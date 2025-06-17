@@ -7,7 +7,7 @@ vpc_cidr = "10.0.0.0/16"
 
 # Glue job configuration
 glue_version = "4.0"
-python_version = "3.10"
+python_version = "3.9"
 worker_type = "G.1X"
 number_of_workers = 2
 max_concurrent_runs = 1

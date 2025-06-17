@@ -38,6 +38,12 @@ variable "create_glue_catalog_database" {
   default     = true
 }
 
+variable "create_glue_catalog" {
+  description = "Whether to create a Glue Data Catalog"
+  type        = bool
+  default     = true
+}
+
 variable "create_glue_crawlers" {
   description = "Whether to create Glue crawlers for data discovery"
   type        = bool

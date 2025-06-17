@@ -5,7 +5,7 @@ output "glue_catalog_database_name" {
 
 output "glue_connection_name" {
   description = "Name of the Glue VPC Connection"
-  value       = aws_glue_connection.vpc_connection.name
+  value       = length(aws_glue_connection.vpc_connection) > 0 ? aws_glue_connection.vpc_connection[0].name : null
 }
 
 output "glue_crawler_name" {
@@ -46,7 +46,6 @@ output "workflow_name" {
 output "workflow_triggers" {
   description = "Names of the Glue workflow triggers"
   value = {
-    start_crawler   = aws_glue_trigger.start_crawler.name
     start_ingestion = aws_glue_trigger.start_ingestion.name
     start_quality   = aws_glue_trigger.start_quality.name
     start_processing = aws_glue_trigger.start_processing.name

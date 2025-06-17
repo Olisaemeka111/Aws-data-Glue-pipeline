@@ -41,7 +41,7 @@ resource "aws_internet_gateway" "main" {
 
 resource "aws_eip" "nat" {
   count = var.enable_nat_gateway ? length(var.availability_zones) : 0
-  vpc   = true
+  domain = "vpc"
 
   tags = {
     Name = "${var.project_name}-${var.environment}-nat-eip-${count.index + 1}"

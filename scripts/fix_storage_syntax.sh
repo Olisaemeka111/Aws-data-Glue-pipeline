@@ -1,3 +1,13 @@
+#!/bin/bash
+
+# Script to fix the syntax errors in the storage module's main.tf file
+echo "Fixing syntax errors in storage module's main.tf file..."
+
+# Create a backup of the original file
+cp /Users/olisa/Desktop/AWS\ Data\ Glue\ pipeline/terraform/modules/storage/main.tf /Users/olisa/Desktop/AWS\ Data\ Glue\ pipeline/terraform/modules/storage/main.tf.bak
+
+# Fix the S3 bucket server-side encryption configuration
+cat > /Users/olisa/Desktop/AWS\ Data\ Glue\ pipeline/terraform/modules/storage/main.tf << 'EOF'
 # Storage module - S3 buckets, DynamoDB tables, and Glue catalog resources
 
 # Raw data bucket
@@ -45,6 +55,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "raw" {
     }
   }
 }
+
 resource "aws_s3_bucket_public_access_block" "raw" {
   bucket                  = aws_s3_bucket.raw.id
   block_public_acls       = true
@@ -98,6 +109,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "processed" {
     }
   }
 }
+
 resource "aws_s3_bucket_public_access_block" "processed" {
   bucket                  = aws_s3_bucket.processed.id
   block_public_acls       = true
@@ -151,6 +163,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "curated" {
     }
   }
 }
+
 resource "aws_s3_bucket_public_access_block" "curated" {
   bucket                  = aws_s3_bucket.curated.id
   block_public_acls       = true
@@ -231,6 +244,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "temp" {
     }
   }
 }
+
 resource "aws_s3_bucket_public_access_block" "temp" {
   bucket                  = aws_s3_bucket.temp.id
   block_public_acls       = true
@@ -404,3 +418,9 @@ resource "aws_iam_role_policy_attachment" "glue_crawler_s3_policy" {
 }
 
 # Include the crawler definitions from the separate file
+EOF
+
+# Append the crawler definitions from the fixed_crawler.tf file
+cat /Users/olisa/Desktop/AWS\ Data\ Glue\ pipeline/terraform/modules/storage/fixed_crawler.tf >> /Users/olisa/Desktop/AWS\ Data\ Glue\ pipeline/terraform/modules/storage/main.tf
+
+echo "Syntax errors in storage module's main.tf file fixed!"

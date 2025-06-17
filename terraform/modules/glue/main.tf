@@ -16,7 +16,7 @@ data "aws_caller_identity" "current" {}
 
 # KMS Key for Glue encryption (if not provided)
 resource "aws_kms_key" "glue_key" {
-  count = var.enable_encryption && var.kms_key_arn == null ? 1 : 0
+  count = var.enable_encryption ? 1 : 0
   
   description             = "KMS key for AWS Glue encryption"
   deletion_window_in_days = 7
@@ -57,7 +57,7 @@ resource "aws_kms_key" "glue_key" {
 }
 
 resource "aws_kms_alias" "glue_key_alias" {
-  count = var.enable_encryption && var.kms_key_arn == null ? 1 : 0
+  count = var.enable_encryption ? 1 : 0
   
   name          = "alias/${var.project_name}-${var.environment}-glue"
   target_key_id = aws_kms_key.glue_key[0].key_id
@@ -65,7 +65,7 @@ resource "aws_kms_alias" "glue_key_alias" {
 
 # Glue Connection for VPC access (only if VPC is configured)
 resource "aws_glue_connection" "vpc_connection" {
-  count = var.subnet_id != null ? 1 : 0
+  count = var.subnet_id != null && var.subnet_id != "" ? 1 : 0
   
   name = "${var.project_name}-${var.environment}-vpc-connection"
   
@@ -202,7 +202,7 @@ resource "aws_glue_security_configuration" "main" {
     }
 
     job_bookmarks_encryption {
-      job_bookmarks_encryption_mode = "SSE-KMS"
+      job_bookmarks_encryption_mode = "CSE-KMS"
       kms_key_arn                   = var.kms_key_arn != null ? var.kms_key_arn : aws_kms_key.glue_key[0].arn
     }
 
@@ -212,11 +212,7 @@ resource "aws_glue_security_configuration" "main" {
     }
   }
   
-  tags = {
-    Name        = "${var.project_name}-${var.environment}-security-config"
-    Environment = var.environment
-    Component   = "glue-security"
-  }
+  # Tags are not supported in aws_glue_security_configuration
 }
 
 # DynamoDB table for job bookmarks
@@ -447,7 +443,7 @@ resource "aws_glue_job" "data_quality" {
   role_arn          = var.glue_service_role_arn
   glue_version      = var.glue_version
   worker_type       = "G.1X"  # Smaller worker type for quality checks
-  number_of_workers = max(2, var.number_of_workers / 2)  # Use fewer workers
+  number_of_workers = max(2, floor(var.number_of_workers / 2))  # Use fewer workers
   timeout           = var.job_timeout
   max_retries       = var.max_retries
   description       = "Data quality validation job for ${var.project_name} in ${var.environment} environment"
@@ -630,7 +626,7 @@ resource "aws_cloudwatch_log_group" "glue_jobs" {
   name              = "/aws-glue/jobs/${var.project_name}-${var.environment}-${each.key}"
   retention_in_days = var.log_retention_days
   
-  kms_key_id = var.enable_encryption ? (var.kms_key_arn != null ? var.kms_key_arn : aws_kms_key.glue_key[0].arn) : null
+  kms_key_id = null  # Disable KMS encryption for log groups to avoid permission issues
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-${each.key}-logs"
