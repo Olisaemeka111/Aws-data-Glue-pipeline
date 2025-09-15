@@ -1,0 +1,14 @@
+# Lambda function dependencies for Glue Health Check solution
+# These are automatically available in the Lambda Python runtime
+
+# Core AWS SDK (pre-installed in Lambda)
+boto3>=1.26.0
+botocore>=1.29.0
+
+# Additional packages if needed (uncomment to include)
+# requests>=2.28.0
+# urllib3>=1.26.0
+
+# For local testing and development
+# pytest>=7.0.0
+# moto>=4.0.0  # For mocking AWS services in tests 

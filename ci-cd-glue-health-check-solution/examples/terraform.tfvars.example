@@ -1,0 +1,8 @@
+# Example Terraform variables for health check
+job_suffix = "pr-123-1640995200"
+is_health_check = true
+script_location = "s3://your-bucket/scripts/data_processing_health_check.py"
+glue_version = "4.0"
+max_capacity = 2
+timeout_minutes = 30
+enable_alarms = true
