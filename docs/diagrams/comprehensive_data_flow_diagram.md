@@ -6,72 +6,72 @@ This diagram shows the complete data flow from data generation through ingestion
 graph TD
     %% Data Generation Layer
     subgraph "Data Generation & Sources"
-        DS1["External Data Sources<br/>• APIs<br/>• Databases<br/>• Files<br/>• Streams"]
-        DS2["Sample Data Generation<br/>• Test Data Creation<br/>• Mock Data<br/>• Health Check Data"]
-        DS3["CI/CD Test Data<br/>• Automated Test Data<br/>• Integration Test Data"]
+        DS1["External Data Sources\n• APIs\n• Databases\n• Files\n• Streams"]
+        DS2["Sample Data Generation\n• Test Data Creation\n• Mock Data\n• Health Check Data"]
+        DS3["CI/CD Test Data\n• Automated Test Data\n• Integration Test Data"]
     end
 
     %% Data Ingestion Layer
     subgraph "Data Ingestion Layer"
-        S3IN["S3 Ingestion Bucket<br/>s3://glue-etl-pipeline-{env}-raw<br/>• data/incoming/YYYY/MM/DD/<br/>• Multiple formats: CSV, JSON, Parquet"]
-        Lambda1["Data Trigger Lambda<br/>• File validation<br/>• Security scanning<br/>• Event processing"]
-        Lambda2["Data Connector Lambda<br/>• Database connections<br/>• API integrations<br/>• Data format conversion"]
+        S3IN["S3 Ingestion Bucket\ns3://glue-etl-pipeline-{env}-raw\n• data/incoming/YYYY/MM/DD/\n• Multiple formats: CSV, JSON, Parquet"]
+        Lambda1["Data Trigger Lambda\n• File validation\n• Security scanning\n• Event processing"]
+        Lambda2["Data Connector Lambda\n• Database connections\n• API integrations\n• Data format conversion"]
     end
 
     %% Data Processing Orchestration
     subgraph "Processing Orchestration"
-        EventBridge["CloudWatch EventBridge<br/>• S3 Event triggers<br/>• Scheduled triggers<br/>• Manual triggers"]
-        GlueWorkflow["Glue Workflow<br/>• Job orchestration<br/>• Dependency management<br/>• Error handling"]
-        Schedule["Scheduled Trigger<br/>• Cron expressions<br/>• Time-based execution"]
-        Manual["Manual Trigger<br/>• AWS Console<br/>• API calls<br/>• CI/CD pipeline"]
+        EventBridge["CloudWatch EventBridge\n• S3 Event triggers\n• Scheduled triggers\n• Manual triggers"]
+        GlueWorkflow["Glue Workflow\n• Job orchestration\n• Dependency management\n• Error handling"]
+        Schedule["Scheduled Trigger\n• Cron expressions\n• Time-based execution"]
+        Manual["Manual Trigger\n• AWS Console\n• API calls\n• CI/CD pipeline"]
     end
 
     %% Data Processing Jobs
     subgraph "ETL Processing Jobs"
-        RawCrawler["Raw Data Crawler<br/>• Schema discovery<br/>• Metadata extraction<br/>• Catalog updates"]
+        RawCrawler["Raw Data Crawler\n• Schema discovery\n• Metadata extraction\n• Catalog updates"]
         
-        IngestionJob["Data Ingestion Job<br/>src/jobs/data_ingestion.py<br/>• Multi-format reading<br/>• Schema standardization<br/>• Data quality validation<br/>• Metadata enrichment<br/>• Partitioning (year/month/day)"]
+        IngestionJob["Data Ingestion Job\nsrc/jobs/data_ingestion.py\n• Multi-format reading\n• Schema standardization\n• Data quality validation\n• Metadata enrichment\n• Partitioning (year/month/day)"]
         
-        ProcessCrawler["Processed Data Crawler<br/>• Schema evolution tracking<br/>• Metadata updates"]
+        ProcessCrawler["Processed Data Crawler\n• Schema evolution tracking\n• Metadata updates"]
         
-        ProcessingJob["Data Processing Job<br/>src/jobs/data_processing.py<br/>• Business transformations<br/>• Data aggregations<br/>• Data enrichment<br/>• Spark optimizations<br/>• Incremental processing"]
+        ProcessingJob["Data Processing Job\nsrc/jobs/data_processing.py\n• Business transformations\n• Data aggregations\n• Data enrichment\n• Spark optimizations\n• Incremental processing"]
         
-        QualityJob["Data Quality Job<br/>src/jobs/data_quality.py<br/>• Quality rule validation<br/>• Anomaly detection<br/>• Quality scoring<br/>• Trend analysis"]
+        QualityJob["Data Quality Job\nsrc/jobs/data_quality.py\n• Quality rule validation\n• Anomaly detection\n• Quality scoring\n• Trend analysis"]
         
-        CurateCrawler["Curated Data Crawler<br/>• Final schema validation<br/>• Query optimization metadata"]
+        CurateCrawler["Curated Data Crawler\n• Final schema validation\n• Query optimization metadata"]
     end
 
     %% Data Storage Layers
     subgraph "Data Storage Layers"
-        S3Raw["S3 Raw Bucket<br/>s3://glue-etl-pipeline-{env}-raw<br/>• Original data preservation<br/>• Immutable storage<br/>• Versioning enabled"]
+        S3Raw["S3 Raw Bucket\ns3://glue-etl-pipeline-{env}-raw\n• Original data preservation\n• Immutable storage\n• Versioning enabled"]
         
-        S3Process["S3 Processed Bucket<br/>s3://glue-etl-pipeline-{env}-processed<br/>• Cleaned & validated data<br/>• Standardized Parquet format<br/>• Snappy compression<br/>• Partitioned by date"]
+        S3Process["S3 Processed Bucket\ns3://glue-etl-pipeline-{env}-processed\n• Cleaned & validated data\n• Standardized Parquet format\n• Snappy compression\n• Partitioned by date"]
         
-        S3Curate["S3 Curated Bucket<br/>s3://glue-etl-pipeline-{env}-curated<br/>• Business-ready datasets<br/>• Aggregated data<br/>• Query-optimized structure"]
+        S3Curate["S3 Curated Bucket\ns3://glue-etl-pipeline-{env}-curated\n• Business-ready datasets\n• Aggregated data\n• Query-optimized structure"]
         
-        S3Quality["S3 Quality Reports<br/>s3://glue-etl-pipeline-{env}-quality<br/>• Quality reports<br/>• Data profiles<br/>• Anomaly reports"]
+        S3Quality["S3 Quality Reports\ns3://glue-etl-pipeline-{env}-quality\n• Quality reports\n• Data profiles\n• Anomaly reports"]
     end
 
     %% Data Catalog & Metadata
     subgraph "Data Catalog & Metadata"
-        GlueCatalog["Glue Data Catalog<br/>• Schema registry<br/>• Metadata management<br/>• Table definitions<br/>• Partition information"]
-        DynamoDB["Job State Tracking<br/>• Job execution status<br/>• Processing metadata<br/>• Error tracking<br/>• Performance metrics"]
+        GlueCatalog["Glue Data Catalog\n• Schema registry\n• Metadata management\n• Table definitions\n• Partition information"]
+        DynamoDB["Job State Tracking\n• Job execution status\n• Processing metadata\n• Error tracking\n• Performance metrics"]
     end
 
     %% Data Access & Query Layer
     subgraph "Data Access & Query Layer"
-        Athena["Amazon Athena<br/>• SQL-based queries<br/>• Ad-hoc analytics<br/>• Data exploration"]
-        Redshift["Redshift Spectrum<br/>• Data warehouse integration<br/>• Complex analytics<br/>• Business intelligence"]
-        S3Access["S3 Direct Access<br/>• Programmatic access<br/>• API integrations<br/>• Data exports"]
-        QuickSight["Amazon QuickSight<br/>• Data visualization<br/>• Dashboards<br/>• Business reports"]
+        Athena["Amazon Athena\n• SQL-based queries\n• Ad-hoc analytics\n• Data exploration"]
+        Redshift["Redshift Spectrum\n• Data warehouse integration\n• Complex analytics\n• Business intelligence"]
+        S3Access["S3 Direct Access\n• Programmatic access\n• API integrations\n• Data exports"]
+        QuickSight["Amazon QuickSight\n• Data visualization\n• Dashboards\n• Business reports"]
     end
 
     %% Monitoring & Alerting
     subgraph "Monitoring & Alerting"
-        CloudWatch["CloudWatch Metrics<br/>• Job performance<br/>• Resource utilization<br/>• Error tracking"]
-        MonitoringLambda["Monitoring Lambda<br/>• Health checks<br/>• Alert processing<br/>• Status reporting"]
-        SNS["SNS Notifications<br/>• Success/failure alerts<br/>• Quality warnings<br/>• Performance notifications"]
-        HealthCheck["Health Check System<br/>• Pipeline validation<br/>• Data quality monitoring<br/>• Automated testing"]
+        CloudWatch["CloudWatch Metrics\n• Job performance\n• Resource utilization\n• Error tracking"]
+        MonitoringLambda["Monitoring Lambda\n• Health checks\n• Alert processing\n• Status reporting"]
+        SNS["SNS Notifications\n• Success/failure alerts\n• Quality warnings\n• Performance notifications"]
+        HealthCheck["Health Check System\n• Pipeline validation\n• Data quality monitoring\n• Automated testing"]
     end
 
     %% Data Flow Connections
