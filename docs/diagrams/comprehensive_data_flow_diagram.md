@@ -6,72 +6,72 @@ This diagram shows the complete data flow from data generation through ingestion
 graph TD
     %% Data Generation Layer
     subgraph "Data Generation & Sources"
-        DS1[External Data Sources<br/>• APIs<br/>• Databases<br/>• Files<br/>• Streams]
-        DS2[Sample Data Generation<br/>• Test Data Creation<br/>• Mock Data<br/>• Health Check Data]
-        DS3[CI/CD Test Data<br/>• Automated Test Data<br/>• Integration Test Data]
+        DS1["External Data Sources<br/>• APIs<br/>• Databases<br/>• Files<br/>• Streams"]
+        DS2["Sample Data Generation<br/>• Test Data Creation<br/>• Mock Data<br/>• Health Check Data"]
+        DS3["CI/CD Test Data<br/>• Automated Test Data<br/>• Integration Test Data"]
     end
 
     %% Data Ingestion Layer
     subgraph "Data Ingestion Layer"
-        S3IN[S3 Ingestion Bucket<br/>s3://glue-etl-pipeline-{env}-raw<br/>• data/incoming/YYYY/MM/DD/<br/>• Multiple formats: CSV, JSON, Parquet]
-        Lambda1[Data Trigger Lambda<br/>• File validation<br/>• Security scanning<br/>• Event processing]
-        Lambda2[Data Connector Lambda<br/>• Database connections<br/>• API integrations<br/>• Data format conversion]
+        S3IN["S3 Ingestion Bucket<br/>s3://glue-etl-pipeline-{env}-raw<br/>• data/incoming/YYYY/MM/DD/<br/>• Multiple formats: CSV, JSON, Parquet"]
+        Lambda1["Data Trigger Lambda<br/>• File validation<br/>• Security scanning<br/>• Event processing"]
+        Lambda2["Data Connector Lambda<br/>• Database connections<br/>• API integrations<br/>• Data format conversion"]
     end
 
     %% Data Processing Orchestration
     subgraph "Processing Orchestration"
-        EventBridge[CloudWatch EventBridge<br/>• S3 Event triggers<br/>• Scheduled triggers<br/>• Manual triggers]
-        GlueWorkflow[Glue Workflow<br/>• Job orchestration<br/>• Dependency management<br/>• Error handling]
-        Schedule[Scheduled Trigger<br/>• Cron expressions<br/>• Time-based execution]
-        Manual[Manual Trigger<br/>• AWS Console<br/>• API calls<br/>• CI/CD pipeline]
+        EventBridge["CloudWatch EventBridge<br/>• S3 Event triggers<br/>• Scheduled triggers<br/>• Manual triggers"]
+        GlueWorkflow["Glue Workflow<br/>• Job orchestration<br/>• Dependency management<br/>• Error handling"]
+        Schedule["Scheduled Trigger<br/>• Cron expressions<br/>• Time-based execution"]
+        Manual["Manual Trigger<br/>• AWS Console<br/>• API calls<br/>• CI/CD pipeline"]
     end
 
     %% Data Processing Jobs
     subgraph "ETL Processing Jobs"
-        RawCrawler[Raw Data Crawler<br/>• Schema discovery<br/>• Metadata extraction<br/>• Catalog updates]
+        RawCrawler["Raw Data Crawler<br/>• Schema discovery<br/>• Metadata extraction<br/>• Catalog updates"]
         
-        IngestionJob[Data Ingestion Job<br/>src/jobs/data_ingestion.py<br/>• Multi-format reading<br/>• Schema standardization<br/>• Data quality validation<br/>• Metadata enrichment<br/>• Partitioning (year/month/day)]
+        IngestionJob["Data Ingestion Job<br/>src/jobs/data_ingestion.py<br/>• Multi-format reading<br/>• Schema standardization<br/>• Data quality validation<br/>• Metadata enrichment<br/>• Partitioning (year/month/day)"]
         
-        ProcessCrawler[Processed Data Crawler<br/>• Schema evolution tracking<br/>• Metadata updates]
+        ProcessCrawler["Processed Data Crawler<br/>• Schema evolution tracking<br/>• Metadata updates"]
         
-        ProcessingJob[Data Processing Job<br/>src/jobs/data_processing.py<br/>• Business transformations<br/>• Data aggregations<br/>• Data enrichment<br/>• Spark optimizations<br/>• Incremental processing]
+        ProcessingJob["Data Processing Job<br/>src/jobs/data_processing.py<br/>• Business transformations<br/>• Data aggregations<br/>• Data enrichment<br/>• Spark optimizations<br/>• Incremental processing"]
         
-        QualityJob[Data Quality Job<br/>src/jobs/data_quality.py<br/>• Quality rule validation<br/>• Anomaly detection<br/>• Quality scoring<br/>• Trend analysis]
+        QualityJob["Data Quality Job<br/>src/jobs/data_quality.py<br/>• Quality rule validation<br/>• Anomaly detection<br/>• Quality scoring<br/>• Trend analysis"]
         
-        CurateCrawler[Curated Data Crawler<br/>• Final schema validation<br/>• Query optimization metadata]
+        CurateCrawler["Curated Data Crawler<br/>• Final schema validation<br/>• Query optimization metadata"]
     end
 
     %% Data Storage Layers
     subgraph "Data Storage Layers"
-        S3Raw[S3 Raw Bucket<br/>s3://glue-etl-pipeline-{env}-raw<br/>• Original data preservation<br/>• Immutable storage<br/>• Versioning enabled]
+        S3Raw["S3 Raw Bucket<br/>s3://glue-etl-pipeline-{env}-raw<br/>• Original data preservation<br/>• Immutable storage<br/>• Versioning enabled"]
         
-        S3Process[S3 Processed Bucket<br/>s3://glue-etl-pipeline-{env}-processed<br/>• Cleaned & validated data<br/>• Standardized Parquet format<br/>• Snappy compression<br/>• Partitioned by date]
+        S3Process["S3 Processed Bucket<br/>s3://glue-etl-pipeline-{env}-processed<br/>• Cleaned & validated data<br/>• Standardized Parquet format<br/>• Snappy compression<br/>• Partitioned by date"]
         
-        S3Curate[S3 Curated Bucket<br/>s3://glue-etl-pipeline-{env}-curated<br/>• Business-ready datasets<br/>• Aggregated data<br/>• Query-optimized structure]
+        S3Curate["S3 Curated Bucket<br/>s3://glue-etl-pipeline-{env}-curated<br/>• Business-ready datasets<br/>• Aggregated data<br/>• Query-optimized structure"]
         
-        S3Quality[S3 Quality Reports<br/>s3://glue-etl-pipeline-{env}-quality<br/>• Quality reports<br/>• Data profiles<br/>• Anomaly reports]
+        S3Quality["S3 Quality Reports<br/>s3://glue-etl-pipeline-{env}-quality<br/>• Quality reports<br/>• Data profiles<br/>• Anomaly reports"]
     end
 
     %% Data Catalog & Metadata
     subgraph "Data Catalog & Metadata"
-        GlueCatalog[Glue Data Catalog<br/>• Schema registry<br/>• Metadata management<br/>• Table definitions<br/>• Partition information]
-        DynamoDB[Job State Tracking<br/>• Job execution status<br/>• Processing metadata<br/>• Error tracking<br/>• Performance metrics]
+        GlueCatalog["Glue Data Catalog<br/>• Schema registry<br/>• Metadata management<br/>• Table definitions<br/>• Partition information"]
+        DynamoDB["Job State Tracking<br/>• Job execution status<br/>• Processing metadata<br/>• Error tracking<br/>• Performance metrics"]
     end
 
     %% Data Access & Query Layer
     subgraph "Data Access & Query Layer"
-        Athena[Amazon Athena<br/>• SQL-based queries<br/>• Ad-hoc analytics<br/>• Data exploration]
-        Redshift[Redshift Spectrum<br/>• Data warehouse integration<br/>• Complex analytics<br/>• Business intelligence]
-        S3Access[S3 Direct Access<br/>• Programmatic access<br/>• API integrations<br/>• Data exports]
-        QuickSight[Amazon QuickSight<br/>• Data visualization<br/>• Dashboards<br/>• Business reports]
+        Athena["Amazon Athena<br/>• SQL-based queries<br/>• Ad-hoc analytics<br/>• Data exploration"]
+        Redshift["Redshift Spectrum<br/>• Data warehouse integration<br/>• Complex analytics<br/>• Business intelligence"]
+        S3Access["S3 Direct Access<br/>• Programmatic access<br/>• API integrations<br/>• Data exports"]
+        QuickSight["Amazon QuickSight<br/>• Data visualization<br/>• Dashboards<br/>• Business reports"]
     end
 
     %% Monitoring & Alerting
     subgraph "Monitoring & Alerting"
-        CloudWatch[CloudWatch Metrics<br/>• Job performance<br/>• Resource utilization<br/>• Error tracking]
-        MonitoringLambda[Monitoring Lambda<br/>• Health checks<br/>• Alert processing<br/>• Status reporting]
-        SNS[SNS Notifications<br/>• Success/failure alerts<br/>• Quality warnings<br/>• Performance notifications]
-        HealthCheck[Health Check System<br/>• Pipeline validation<br/>• Data quality monitoring<br/>• Automated testing]
+        CloudWatch["CloudWatch Metrics<br/>• Job performance<br/>• Resource utilization<br/>• Error tracking"]
+        MonitoringLambda["Monitoring Lambda<br/>• Health checks<br/>• Alert processing<br/>• Status reporting"]
+        SNS["SNS Notifications<br/>• Success/failure alerts<br/>• Quality warnings<br/>• Performance notifications"]
+        HealthCheck["Health Check System<br/>• Pipeline validation<br/>• Data quality monitoring<br/>• Automated testing"]
     end
 
     %% Data Flow Connections

@@ -6,52 +6,52 @@ This diagram specifically focuses on the data generation and ingestion process i
 graph TD
     %% Data Generation Sources
     subgraph "Data Generation Sources"
-        API[External APIs<br/>• REST APIs<br/>• GraphQL APIs<br/>• Third-party APIs]
-        DB[Database Sources<br/>• RDS/Aurora<br/>• External DBs<br/>• Data warehouses]
-        Files[File Sources<br/>• CSV files<br/>• JSON files<br/>• Parquet files<br/>• ORC/Avro files]
-        Streams[Streaming Sources<br/>• Kinesis Data Streams<br/>• Kafka<br/>• SQS queues]
+        API["External APIs<br/>• REST APIs<br/>• GraphQL APIs<br/>• Third-party APIs"]
+        DB["Database Sources<br/>• RDS/Aurora<br/>• External DBs<br/>• Data warehouses"]
+        Files["File Sources<br/>• CSV files<br/>• JSON files<br/>• Parquet files<br/>• ORC/Avro files"]
+        Streams["Streaming Sources<br/>• Kinesis Data Streams<br/>• Kafka<br/>• SQS queues"]
     end
 
     %% Test Data Generation
     subgraph "Test Data Generation"
-        CICD[CI/CD Test Data<br/>• Automated test data<br/>• Integration testing<br/>• Pipeline validation]
-        Health[Health Check Data<br/>• Stub data creation<br/>• Pipeline monitoring<br/>• Automated testing]
-        Unit[Unit Test Data<br/>• Mock data<br/>• Component testing<br/>• Development testing]
+        CICD["CI/CD Test Data<br/>• Automated test data<br/>• Integration testing<br/>• Pipeline validation"]
+        Health["Health Check Data<br/>• Stub data creation<br/>• Pipeline monitoring<br/>• Automated testing"]
+        Unit["Unit Test Data<br/>• Mock data<br/>• Component testing<br/>• Development testing"]
     end
 
     %% Data Connectors
     subgraph "Data Connectors"
-        Lambda1[Data Trigger Lambda<br/>• File validation<br/>• Security scanning<br/>• Event processing<br/>• Format detection]
-        Lambda2[Database Connector<br/>• DB connections<br/>• Query execution<br/>• Data extraction<br/>• Format conversion]
-        Lambda3[API Connector<br/>• API calls<br/>• Authentication<br/>• Rate limiting<br/>• Error handling]
-        Kinesis[Kinesis Consumer<br/>• Stream processing<br/>• Real-time ingestion<br/>• Data buffering]
+        Lambda1["Data Trigger Lambda<br/>• File validation<br/>• Security scanning<br/>• Event processing<br/>• Format detection"]
+        Lambda2["Database Connector<br/>• DB connections<br/>• Query execution<br/>• Data extraction<br/>• Format conversion"]
+        Lambda3["API Connector<br/>• API calls<br/>• Authentication<br/>• Rate limiting<br/>• Error handling"]
+        Kinesis["Kinesis Consumer<br/>• Stream processing<br/>• Real-time ingestion<br/>• Data buffering"]
     end
 
     %% Data Ingestion
     subgraph "Data Ingestion Layer"
-        S3Raw[S3 Raw Bucket<br/>s3://glue-etl-pipeline-{env}-raw<br/>• data/incoming/YYYY/MM/DD/<br/>• Multiple formats supported<br/>• Immutable storage]
+        S3Raw["S3 Raw Bucket<br/>s3://glue-etl-pipeline-{env}-raw<br/>• data/incoming/YYYY/MM/DD/<br/>• Multiple formats supported<br/>• Immutable storage"]
         
-        Validation[Data Validation<br/>• File size checks<br/>• Format validation<br/>• Security scanning<br/>• Naming conventions]
+        Validation["Data Validation<br/>• File size checks<br/>• Format validation<br/>• Security scanning<br/>• Naming conventions"]
         
-        FormatDetection[Format Detection<br/>• Extension-based<br/>• Content analysis<br/>• Auto-detection<br/>• Fallback handling]
+        FormatDetection["Format Detection<br/>• Extension-based<br/>• Content analysis<br/>• Auto-detection<br/>• Fallback handling"]
     end
 
     %% Data Processing
     subgraph "Data Processing Pipeline"
-        IngestionJob[Data Ingestion Job<br/>src/jobs/data_ingestion.py<br/>• Multi-format reading<br/>• Schema standardization<br/>• Metadata enrichment<br/>• Quality validation]
+        IngestionJob["Data Ingestion Job<br/>src/jobs/data_ingestion.py<br/>• Multi-format reading<br/>• Schema standardization<br/>• Metadata enrichment<br/>• Quality validation"]
         
-        ProcessingJob[Data Processing Job<br/>src/jobs/data_processing.py<br/>• Business transformations<br/>• Data aggregations<br/>• Data enrichment<br/>• Performance optimization]
+        ProcessingJob["Data Processing Job<br/>src/jobs/data_processing.py<br/>• Business transformations<br/>• Data aggregations<br/>• Data enrichment<br/>• Performance optimization"]
         
-        QualityJob[Data Quality Job<br/>src/jobs/data_quality.py<br/>• Quality rule validation<br/>• Anomaly detection<br/>• Quality scoring<br/>• Trend analysis]
+        QualityJob["Data Quality Job<br/>src/jobs/data_quality.py<br/>• Quality rule validation<br/>• Anomaly detection<br/>• Quality scoring<br/>• Trend analysis"]
     end
 
     %% Data Storage
     subgraph "Data Storage Layers"
-        S3Processed[S3 Processed Bucket<br/>• Cleaned & validated data<br/>• Standardized Parquet<br/>• Snappy compression<br/>• Date partitioning]
+        S3Processed["S3 Processed Bucket<br/>• Cleaned & validated data<br/>• Standardized Parquet<br/>• Snappy compression<br/>• Date partitioning"]
         
-        S3Curated[S3 Curated Bucket<br/>• Business-ready data<br/>• Aggregated datasets<br/>• Query-optimized<br/>• Final output layer]
+        S3Curated["S3 Curated Bucket<br/>• Business-ready data<br/>• Aggregated datasets<br/>• Query-optimized<br/>• Final output layer"]
         
-        S3Quality[S3 Quality Reports<br/>• Quality metrics<br/>• Data profiles<br/>• Anomaly reports<br/>• Trend analysis]
+        S3Quality["S3 Quality Reports<br/>• Quality metrics<br/>• Data profiles<br/>• Anomaly reports<br/>• Trend analysis"]
     end
 
     %% Data Flow Connections
